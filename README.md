@@ -25,6 +25,23 @@ A Telegram bot that automatically sends daily Compline polls to a group chat top
 
 ## Setup Instructions
 
+### 0. Development Setup (Optional - for local testing)
+
+If you want to test the bot locally before deploying:
+
+```bash
+# Clone/download this repository
+git clone <your-repo-url>
+cd telegram-poll-bot
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
 ### 1. Create a Telegram Bot
 
 1. Open Telegram and search for `@BotFather`
@@ -74,9 +91,13 @@ You can test the bot manually by:
 
 ## Local Testing
 
-To test locally before deploying:
+To test locally before deploying (using virtual environment):
 
 ```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 # Install dependencies
 pip install -r requirements.txt
 
@@ -95,6 +116,9 @@ python poll_bot.py --send-reminder
 
 # Get chat information
 python poll_bot.py --get-chat-info
+
+# Deactivate virtual environment when done
+deactivate
 ```
 
 ## Schedule
