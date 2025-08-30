@@ -4,7 +4,8 @@ A Telegram bot that automatically sends daily Compline polls to a group chat top
 
 ## Features
 
-- 🕐 Runs daily at 10 AM Singapore time via GitHub Actions
+- 🕐 Sends daily polls at 10 AM Singapore time via GitHub Actions
+- 🕘 Sends reminder messages at 9 PM Singapore time (1 hour before Compline)
 - 📊 Sends non-anonymous polls with single-answer selection
 - 🧵 Supports Telegram group topics/threads
 - ⛪ Customized for Catholic Compline prayer invitations
@@ -17,6 +18,10 @@ A Telegram bot that automatically sends daily Compline polls to a group chat top
 - Yes
 - Not today
 - Will confirm later today
+
+## Reminder Message
+
+**9 PM Message:** "Compline is in < 1hour!! Yay! Please confirm whether you are coming in the poll"
 
 ## Setup Instructions
 
@@ -80,8 +85,13 @@ export TELEGRAM_BOT_TOKEN="your_bot_token"
 export TELEGRAM_CHAT_ID="your_chat_id"
 export TELEGRAM_MESSAGE_THREAD_ID="your_topic_id"  # Optional
 
-# Send a test poll
+# Send a test poll (default action)
 python poll_bot.py
+# or explicitly:
+python poll_bot.py --send-poll
+
+# Send a test reminder message
+python poll_bot.py --send-reminder
 
 # Get chat information
 python poll_bot.py --get-chat-info
@@ -89,9 +99,15 @@ python poll_bot.py --get-chat-info
 
 ## Schedule
 
-The bot runs daily at:
+The bot runs twice daily:
+
+### Daily Poll
 - **10:00 AM Singapore Time (UTC+8)**
 - **2:00 AM UTC**
+
+### Reminder Message
+- **9:00 PM Singapore Time (UTC+8)**
+- **1:00 PM UTC**
 
 ## Troubleshooting
 
@@ -113,9 +129,11 @@ The bot runs daily at:
 telegram-poll-bot/
 ├── .github/
 │   └── workflows/
-│       └── daily-compline-poll.yml    # GitHub Actions workflow
+│       ├── daily-compline-poll.yml    # GitHub Actions workflow for 10 AM polls
+│       └── compline-reminder.yml      # GitHub Actions workflow for 9 PM reminders
 ├── poll_bot.py                        # Main bot script
 ├── requirements.txt                    # Python dependencies
+├── .gitignore                         # Git ignore file
 └── README.md                          # This file
 ```
 

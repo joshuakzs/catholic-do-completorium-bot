@@ -75,6 +75,61 @@ def send_poll():
         sys.exit(1)
 
 
+def send_reminder():
+    """Send a 9 PM reminder message about Compline."""
+    
+    # Get configuration from environment variables
+    bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    message_thread_id = os.getenv('TELEGRAM_MESSAGE_THREAD_ID')  # Topic ID
+    
+    if not bot_token:
+        print("❌ Error: TELEGRAM_BOT_TOKEN environment variable not set")
+        sys.exit(1)
+        
+    if not chat_id:
+        print("❌ Error: TELEGRAM_CHAT_ID environment variable not set")
+        sys.exit(1)
+    
+    # Reminder message
+    message = "Compline is in < 1hour!! Yay! Please confirm whether you are coming in the poll"
+    
+    # Telegram Bot API endpoint for sending messages
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    
+    # Message parameters
+    data = {
+        'chat_id': chat_id,
+        'text': message
+    }
+    
+    # Add message thread ID if specified (for topic-specific messages)
+    if message_thread_id:
+        data['message_thread_id'] = message_thread_id
+    
+    try:
+        response = requests.post(url, data=data)
+        response.raise_for_status()
+        
+        result = response.json()
+        if result.get('ok'):
+            print(f"✅ Catholic_DO_Completorium_Bot: Reminder sent successfully!")
+            print(f"💬 Message: {message}")
+            if message_thread_id:
+                print(f"🧵 Topic ID: {message_thread_id}")
+            print(f"🕘 Sent at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        else:
+            print(f"❌ Failed to send reminder: {result.get('description', 'Unknown error')}")
+            sys.exit(1)
+            
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Network error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        sys.exit(1)
+
+
 def get_chat_info():
     """Helper function to get chat information (useful for setup)."""
     bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -108,7 +163,19 @@ def get_chat_info():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--get-chat-info":
-        get_chat_info()
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--get-chat-info":
+            get_chat_info()
+        elif sys.argv[1] == "--send-reminder":
+            send_reminder()
+        elif sys.argv[1] == "--send-poll":
+            send_poll()
+        else:
+            print("Usage: python poll_bot.py [--get-chat-info|--send-reminder|--send-poll]")
+            print("  --get-chat-info: Get chat and topic information")
+            print("  --send-reminder: Send 9 PM reminder message")
+            print("  --send-poll: Send daily poll (default)")
+            sys.exit(1)
     else:
+        # Default action is to send poll
         send_poll()
