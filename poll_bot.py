@@ -27,7 +27,7 @@ def send_poll():
         sys.exit(1)
     
     # Poll configuration for Catholic_DO_Completorium_Bot
-    question = "Grace to you and peace from God our Father and the Lord Jesus Christ. Compline at 10pm today? Zoom link: 'https://nus-sg.zoom.us/j/6925593331'"
+    question = "Grace to you and peace from God our Father and the Lord Jesus Christ. Compline at 10pm today? Zoom link: https://nus-sg.zoom.us/j/6925593331"
     options = [
         "Yes",
         "Not today", 
@@ -138,6 +138,22 @@ def get_chat_info():
         print("❌ Error: TELEGRAM_BOT_TOKEN environment variable not set")
         return
     
+    # First, check if the bot is working
+    me_url = f"https://api.telegram.org/bot{bot_token}/getMe"
+    try:
+        me_response = requests.get(me_url)
+        me_result = me_response.json()
+        if me_result.get('ok'):
+            bot_info = me_result.get('result', {})
+            print(f"🤖 Bot Info: {bot_info.get('first_name')} (@{bot_info.get('username')})")
+        else:
+            print(f"❌ Bot token error: {me_result.get('description')}")
+            return
+    except Exception as e:
+        print(f"❌ Error checking bot: {e}")
+        return
+    
+    # Get updates
     url = f"https://api.telegram.org/bot{bot_token}/getUpdates"
     
     try:
@@ -146,17 +162,31 @@ def get_chat_info():
         
         result = response.json()
         if result.get('ok'):
-            print("📱 Catholic_DO_Completorium_Bot - Recent chat information:")
-            for update in result.get('result', []):
+            updates = result.get('result', [])
+            print(f"\n📱 Found {len(updates)} recent updates:")
+            
+            if not updates:
+                print("\n💡 No recent messages found. To get Chat ID and Topic ID:")
+                print("   1. Go to your Telegram group/topic")
+                print("   2. Send a message mentioning the bot: @Catholic_DO_Completorium_Bot test")
+                print("   3. Run this command again immediately after")
+                return
+            
+            seen_chats = set()
+            for update in updates:
                 message = update.get('message', {})
                 chat = message.get('chat', {})
-                if chat:
-                    print(f"Chat ID: {chat.get('id')}")
-                    print(f"Chat Title: {chat.get('title', 'N/A')}")
-                    print(f"Chat Type: {chat.get('type')}")
+                if chat and chat.get('id') not in seen_chats:
+                    seen_chats.add(chat.get('id'))
+                    print(f"\n📨 Chat found:")
+                    print(f"   Chat ID: {chat.get('id')}")
+                    print(f"   Chat Title: {chat.get('title', 'N/A')}")
+                    print(f"   Chat Type: {chat.get('type')}")
                     if message.get('message_thread_id'):
-                        print(f"Topic ID: {message.get('message_thread_id')}")
-                    print("---")
+                        print(f"   Topic ID: {message.get('message_thread_id')}")
+                    print("   ---")
+        else:
+            print(f"❌ API Error: {result.get('description')}")
         
     except Exception as e:
         print(f"❌ Error getting chat info: {e}")
