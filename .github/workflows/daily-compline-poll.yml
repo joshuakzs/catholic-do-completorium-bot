@@ -1,0 +1,39 @@
+name: Daily Compline Poll
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC (10:00 AM Singapore time, UTC+8)
+    - cron: '0 2 * * *'
+  
+  # Allow manual triggering for testing
+  workflow_dispatch:
+
+jobs:
+  send-compline-poll:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Send Compline Poll
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
+      run: |
+        python poll_bot.py
+    
+    - name: Log completion
+      run: |
+        echo "✅ Catholic_DO_Completorium_Bot executed at $(date) (10 AM Singapore time)"
