@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ### 2. Get Your Group Chat ID and Topic ID
 
 1. Add your bot to the Telegram group
-2. Give the bot admin permissions (or at least permission to send messages)
+2. Give the bot admin permissions
 3. If using a topic, navigate to the specific topic where you want polls sent
 4. Send a message in the group/topic mentioning your bot (e.g., `@Catholic_DO_Completorium_Bot hello`)
 
